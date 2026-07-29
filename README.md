@@ -1,46 +1,125 @@
 # Rank and Yank
 
-**Your best model runs the company. Everything else competes to keep its desk.**
+**Your smartest model is expensive. Stop using it to type.**
 
-A Claude Code skill that turns your most expensive model into an orchestrator and pushes
-execution down to cheaper subagents. The subagents are not anonymous. They hold named personas
-with recorded scores, they can see their own standing, and when the roster exceeds eight the
-bottom-ranked one is retired.
+It becomes the boss. Cheap models do the work. Every job gets a score. The worst worker gets
+fired.
 
-Named after the forced-ranking practice, because that is precisely what it does.
+```mermaid
+flowchart LR
+    U["You"] -->|"a task"| B["Smart model<br/>THE BOSS"]
+    B -->|"detailed orders"| A["Cheap models<br/>THE STAFF"]
+    A -->|"work + report"| B
+    B -->|"score out of 10"| L[("Scoreboard<br/>on disk")]
+    L -->|"ranking"| R["Top 8 stay<br/>No. 9 is fired"]
+    B -->|"checked answer"| U
+```
 
 ---
 
-## The problem
+## The whole idea in 20 seconds
 
-An expensive model's marginal value is judgment: framing a problem, choosing an approach,
-catching what is wrong, noticing what is missing. That value is destroyed when you spend it
-grepping a repo or typing out code whose every decision is already made.
+- The smart model **thinks**. It plans, writes orders, and checks the work.
+- The smart model **never** greps, types code, or runs tests. That is wasted money.
+- Cheap models **do** all of that.
+- Every finished job gets **scored out of 10**.
+- Workers who score well get **saved and reused**. Workers who score badly get **cut**.
+- Each project has room for **8 workers only**.
 
-The usual fix is "delegate more", which works once and then stops improving. You write a
-throwaway prompt, an agent returns something plausible, you skim it, and nothing about the next
-task is any easier.
+You pay for one good brain and many cheap hands.
 
-## What this does instead
+---
 
-Four things, and the fourth is the one that compounds.
+## It is natural selection
 
-1. **The orchestrator only thinks.** Planning, decomposition, brief writing, review, synthesis.
-   Never scanning, typing, or running.
-2. **Execution goes to a tier that fits.** Sonnet for real work, Haiku for genuinely mechanical
-   work, an expensive subagent only as a documented last resort.
-3. **Every run is scored** on correctness, completeness, spec adherence, and report quality, and
-   the score is written to disk under a named persona.
-4. **Both sides of the loop improve.** Agents that perform get minted into reusable personas and
-   promoted to real subagent types. Briefs that fail get their defect written into a checklist
-   the orchestrator reads before writing the next one.
+Your agents are not anonymous. Each one has a name, a job, and a score history on disk.
 
-The result over time is a small roster of proven specialists per codebase, and an orchestrator
-that stops repeating its own prompt mistakes.
+They compete. Only the best 8 keep their spot.
+
+```mermaid
+flowchart TD
+    C["New agent<br/>no name yet"] -->|"scores 8.5 or better"| M["HIRED<br/>gets a name and a file"]
+    C -->|"scores low"| G["Forgotten"]
+    M -->|"3 jobs at 8.0+"| P["PROMOTED<br/>reusable in any project"]
+    M -->|"ranks last when<br/>a 9th is hired"| F["FIRED<br/>file moved to retired/"]
+    P -->|"ranks last"| F
+```
+
+**How a worker gets hired.** It scores 8.5 or better on a job that will come up again. The boss
+writes down what worked and saves it as a reusable worker.
+
+**How a worker gets fired.** The roster is full at 8. Hire a 9th and whoever ranks last is gone.
+Even a good worker can be cut for being last in a strong team. New workers get 3 jobs of grace
+first, so nobody is cut before they have had a fair chance.
+
+**Every worker sees its own standing.** Its score. Its rank. Who got fired last. It knows the
+next job matters.
+
+---
+
+## Workers can talk back
+
+The best thing a worker can do is tell the boss the orders are wrong.
+
+So there is a reward for it.
+
+| What the worker did | Score change |
+| :--- | :---: |
+| Caught a real mistake that would have caused damage | **+1.0** |
+| Found a real improvement | **+0.5** |
+| Brought proof, but was wrong anyway | **0** |
+| Just guessed. No proof | **-0.5** |
+| Said nothing | **0** |
+
+Three rules keep this honest:
+
+1. **Show proof.** Point at a file and line, or real command output. "This might be a problem" is
+   a guess, and guessing costs points.
+2. **Stay in your lane.** Only complain about your own job. Do not go hunting through the rest of
+   the code for something to report.
+3. **Being wrong is free.** Bring real proof and still be wrong, you lose nothing. Punishing
+   honest mistakes just teaches workers to stay quiet.
+
+When the boss agrees, it fixes the orders and sends them back to **the same worker**, so no work
+is thrown away.
+
+---
+
+## Workers can rewrite their own job description
+
+Each worker reads its job file before it starts. If the job file does not fit this task, it says
+so, works its own better way, and the boss decides after.
+
+| What the worker proposed | Score change |
+| :--- | :---: |
+| A real improvement. Boss keeps it | **+0.5** |
+| Fair idea, boss says no | **0** |
+| Trying to make its own job easier | **-0.5** |
+
+Good changes get written into the file, credited to the worker who spotted them.
+
+---
+
+## Bad orders are the boss's fault, not the worker's
+
+Before writing any score, the boss asks one question:
+
+> Could any good worker have gotten this right from my orders alone?
+
+If no, the worker is **not** punished. The boss writes its own mistake down in a checklist
+instead, and reads that checklist before writing the next orders.
+
+This matters. Without it, the scores measure how well the boss writes orders, not how well the
+workers work, and the wrong people get fired.
+
+**One exception.** If the worker *spotted* the bad orders instead of tripping over them, it gets
+a full score plus the bonus. Tripping is free. Catching is what you are paying for.
 
 ---
 
 ## Install
+
+Pick either.
 
 **As a plugin:**
 
@@ -55,155 +134,62 @@ that stops repeating its own prompt mistakes.
 git clone https://github.com/bazarkua/rank-and-yank ~/.claude/skills/rank-and-yank
 ```
 
-Either way the skill activates itself on substantive tasks. It is written as a standing
-operating mode, not a command you invoke per task, though `/rank-and-yank` works if you want to
-force it.
-
-Nothing is written until you actually delegate something. On first delegation it creates
-`~/.claude/rank-and-yank/` and a folder for the current project.
+It turns itself on for real work. You do not need to call it every time.
 
 ---
 
-## How it works
+## What shows up on your disk
 
-### The roster is per project, and capped at eight
-
-The specialists a codebase needs are specific to that codebase, so each project gets its own
-company. The project is resolved from the git repository root name. Persona numbers restart at
-`01` per project.
-
-A persona is minted when a run scores 8.5 or higher on a task shape that will recur and that no
-existing persona owns. Its file carries the parts of the brief that actually worked, the output
-shape that proved usable, and every failure mode it has been caught in.
-
-At three runs averaging 8.0 or better, a persona is promoted to `~/.claude/agents/` as a real
-`subagent_type`, callable from any session.
-
-When minting would make nine, the lowest-ranked persona past its protection window is retired.
-The cut is relative, so a persona averaging 8.5 can still be cut for ranking last in a strong
-field. New personas are protected for their first three runs so they are not cut before they
-have run twice.
-
-### Agents can see their standing, and they are told what it means
-
-Every brief carries a block stating the persona's average, its rank, the size of the cap, and
-who has already been retired. This is not decoration. The scores are real, they are written to
-disk, and retirement actually removes the persona.
-
-### Agents can push back, and it pays
-
-The most valuable thing a subagent can do is tell you your instruction is wrong. So there is a
-formal channel for it, with a real reward:
-
-| Challenge ruling | Adjustment |
-|---|---|
-| Verified, prevented real damage | **+1.0** |
-| Verified, improved the outcome | **+0.5** |
-| Cited real evidence, drew the wrong conclusion | **0** |
-| No evidence: speculation, hedging, out of scope, or a bid for points | **-0.5** |
-| Nothing challenged | **0** |
-
-Three constraints keep this from turning into noise:
-
-- **Evidence bar.** A challenge is admissible only if it points at a file and line, actual file
-  contents, real command output, or a line of the brief contradicting another. "This might be a
-  problem" is a guess, and guesses are penalized. Confidence is not evidence; a model can feel
-  certain and be wrong.
-- **Scope fence.** The challenge must come out of the agent's own assignment. It does not go
-  hunting through the wider codebase for something to object to, because that spends the exact
-  tokens this skill exists to save.
-- **Honest wrong calls are free.** Cite real evidence, reach the wrong conclusion, score zero
-  rather than a penalty. Penalizing good-faith misses teaches agents to stay quiet precisely
-  when you most need to hear from them.
-
-When a challenge is upheld, the orchestrator rewrites the brief and resumes **the same agent**
-via `SendMessage`, so the context it already paid to build is not thrown away. If sibling agents
-are running under the same bad brief, the correction is pushed to all of them at once.
-
-### Agents can amend their own persona
-
-Each agent reads its persona before starting and decides whether it actually fits the task in
-front of it. If part of it does not, the agent declares the amendment, works under its own
-amended version, and the orchestrator rules at review.
-
-| Amendment ruling | Adjustment |
-|---|---|
-| Accepted, measurably improves the persona | **+0.5** |
-| Reasonable, but declined | **0** |
-| Self-serving: loosens its own constraints or widens its own scope | **-0.5** |
-
-Accepted amendments are written into the persona file crediting the agent. The persona was
-written from past runs; the agent holding it is the first to see where it stopped fitting.
-
-### Bad briefs are charged to the orchestrator, not the roster
-
-Before writing any score, the orchestrator asks whether a competent agent could have gotten this
-right from the brief alone. If not, the run is logged as a prompt defect, the agent's average is
-untouched, and the missing element goes into a checklist that gets read before the next brief.
-
-Without this rule the ranking measures the orchestrator's prompting rather than the agents' work,
-and elimination starts cutting the wrong personas.
-
-One exception carries most of the weight: if the agent **caught** the defect instead of being
-tripped by it, it gets a real score on the corrected work plus the challenge bonus. Being
-tripped is neutral. Catching it is the behavior being selected for.
-
----
-
-## Layout
-
-The skill is read-only. All state lives outside it, so a plugin update cannot destroy your
-history.
+Nothing is written until you actually give it a task.
 
 ```
 ~/.claude/rank-and-yank/
-  BRIEF-CHECKLIST.md              your own recurring brief defects
-  projects/<project>/
-    STANDINGS.md                  the roster and its ranking
-    RUNS.md                       append-only run log
-    BRIEF-CHECKLIST.md            defects specific to this codebase
-    personas/sonnet-01-*.md       up to 8
-    personas/retired/
+├── BRIEF-CHECKLIST.md          mistakes the boss keeps making
+└── projects/
+    └── my-app/
+        ├── STANDINGS.md        the ranking
+        ├── RUNS.md             every job, every score
+        ├── BRIEF-CHECKLIST.md  mistakes specific to this codebase
+        └── personas/           your 8 workers
+            └── retired/        the ones you fired
 ```
 
-A run log line:
+One job looks like one line:
 
 ```
-2026-01-04 | sonnet-01-scout | sonnet | 9.3 | C9 X8 S9 R9 | +1.0 | refactor the loader | CHALLENGE upheld, damage: brief targeted the deprecated copy under legacy/, real callers use core/. Corrected and resumed via SendMessage.
+2026-01-04 | sonnet-01-scout | 9.3 | C9 X8 S9 R9 | +1.0 | refactor the loader
+             CHALLENGE upheld: my orders pointed at the old copy in legacy/.
+             The real callers are in core/. Fixed and resumed.
 ```
 
-That is the entire per-run bookkeeping cost: one appended line, plus one row updated in
-`STANDINGS.md`. Persona files are rewritten only on mint, promote, retire, or an accepted
-amendment.
+Scores come from four things, each out of 10:
+
+| | |
+| :--- | :--- |
+| **C** | Is it correct? |
+| **X** | Is it all there? |
+| **S** | Did it follow orders? |
+| **R** | Was the report usable? |
 
 ---
 
-## What this is not
+## Honest limits
 
-Being straight about the limits, because they matter before you adopt it.
-
-- **It is prompt discipline, not enforced code.** Nothing validates the scores or stops the
-  orchestrator from skipping the ledger. If it skips scoring, this degrades into ordinary
-  delegation and stops compounding.
-- **Scores are model judgments.** They are anchored to four named dimensions and to cited
-  evidence, which makes them consistent enough to rank on, but they are not measurements.
-- **Review costs orchestrator tokens.** The savings come from not executing, not from skipping
-  review. Reviewing is the job.
-- **It is worth nothing on trivial turns.** Spawning an agent to read one known file costs more
-  than doing it. The skill says so explicitly.
-- **The roster needs real runs to become useful.** Expect the first several tasks to go out as
-  unnamed candidates while slots are still open.
-
-## Tiers
-
-The skill says Opus, Sonnet, and Haiku because those are what Claude Code's `Agent` tool takes.
-Read them as roles: an expensive orchestrator, a mid-tier workhorse, and a cheap mechanical tier.
-Substitute your own.
+- This is discipline written in words, not code. Nothing forces the boss to keep score. If it
+  stops scoring, this is just normal delegating.
+- Scores are judgments, not measurements. Four fixed questions and required proof keep them
+  steady enough to rank on.
+- Reviewing still costs money. The savings come from not doing the typing.
+- Not worth it for tiny jobs. Reading one file yourself is cheaper than hiring someone.
+- The roster starts empty. Your first few jobs go to nameless workers trying out for a spot.
 
 ---
 
-## License
+## About the model names
 
-MIT. See [LICENSE](LICENSE).
+The skill says Opus, Sonnet, and Haiku because that is what Claude Code accepts. Read them as
+roles: one expensive brain, a solid worker, and a cheap pair of hands. Swap in your own.
 
-By [Adilbek Bazarkulov](https://github.com/bazarkua).
+---
+
+MIT licensed. Built by [Adilbek Bazarkulov](https://github.com/bazarkua).
