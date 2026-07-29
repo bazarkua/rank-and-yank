@@ -1,0 +1,39 @@
+{
+  "name": "rank-and-yank",
+  "description": "Run your most expensive model as an orchestrator. Cheaper agents compete for a capped roster.",
+  "owner": {
+    "name": "Adilbek Bazarkulov",
+    "url": "https://github.com/bazarkua"
+  },
+  "plugins": [
+    {
+      "name": "rank-and-yank",
+      "displayName": "Rank and Yank",
+      "source": "./",
+      "description": "Standing operating mode that spends your expensive model's tokens on judgment and pushes execution down to cheaper subagents, which compete for a capped per-project roster with real scores, real elimination, and a channel to push back on bad instructions.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Adilbek Bazarkulov",
+        "url": "https://github.com/bazarkua"
+      },
+      "homepage": "https://github.com/bazarkua/rank-and-yank",
+      "repository": "https://github.com/bazarkua/rank-and-yank",
+      "license": "MIT",
+      "category": "workflow",
+      "keywords": [
+        "orchestration",
+        "subagents",
+        "delegation",
+        "multi-agent",
+        "cost-optimization",
+        "token-budget",
+        "prompt-engineering"
+      ],
+      "tags": [
+        "orchestration",
+        "subagents",
+        "cost"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+.DS_Store
+
+# Runtime state never belongs in this repo. It lives at ~/.claude/rank-and-yank/
+# These entries exist so a stray write cannot leak your rosters, scores, or the
+# codebase-specific notes your agents accumulate.
+projects/
+ledger/
+**/BRIEF-CHECKLIST.md
+!skills/rank-and-yank/templates/BRIEF-CHECKLIST.global.md
+!skills/rank-and-yank/templates/BRIEF-CHECKLIST.project.md
